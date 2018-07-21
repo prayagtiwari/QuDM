@@ -64,12 +64,12 @@ X_train_kbest.todense().shape
 from sklearn.naive_bayes import GaussianNB
 clf = GaussianNB()
 
-
-def getFirstLabel( y_train):
-    y_train_first_label= []
-    for i in range(y_train.toarray().shape[0]):
-        y_train_first_label.append(    y_train.toarray()[i].nonzero()[0][0])
-    return y_train_first_label
+#
+#def getFirstLabel( y_train):
+#    y_train_first_label= []
+#    for i in range(y_train.toarray().shape[0]):
+#        y_train_first_label.append(    y_train.toarray()[i].nonzero()[0][0])
+#    return y_train_first_label
     
 def batch_prediction(data,clf=clf,size=128):
     # data,condition = x_train_dense,  y_train_dense[:,i]==1
@@ -88,21 +88,40 @@ clf.fit(X_train_kbest.toarray(), getFirstLabel(y_train))
 predictions = batch_prediction(X_test_kbest.toarray(),clf)
 #predictions = clf.predict(X_test_kbest.toarray())
 
-
-def getAccuracy(testSet, predictions):
-	correct = 0
-	for x in range(len(testSet)):
-		if testSet[x][-1] == predictions[x]:
-			correct += 1
-	return (correct/float(len(testSet))) * 100.0
-
-acc=getAccuracy(getFirstLabel(y_test),predictions)
-print(acc)
-
+def firstLabelFast(data):
    
+    rows,cols = data.toarray().nonzero()
+    
+    results=[]
+    pointer =0 
+    for i,j in zip(rows,cols):
+        if pointer == i:
+            results.append(j)
+            pointer= pointer +1
+    return results
+#
+#def getAccuracy(testSet, predictions):
+#	correct = 0
+#	for x in range(len(testSet)):
+#		if testSet[x] == predictions[x]:
+#			correct += 1
+#	return (correct/float(len(testSet))) * 100.0
+#
+#acc=getAccuracy(firstLabelFast(y_test),predictions)
+#print(acc)
 
+print(sum(firstLabelFast(y_test) == predictions) *1.0 / len(predictions))
 
+    
+#import pandas as pd
 
+#df= pd.DataFrame({"cols":cols, "rows":rows})
+
+#sum(result == predictions) *1.0 / len(predictions)
+
+#result = df.groupby("rows").apply(lambda group:group.reset_index()["cols"][0] )
+# inport random
+#result = df.groupby("rows").apply(lambda group:group.reset_index()["cols"][random.randint(0,len(group)-1)] )
 #from keras.models import Sequential
 #from keras.layers import Dense, Activation, Embedding
 #from keras.layers import LSTM
