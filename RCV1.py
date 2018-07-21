@@ -63,7 +63,17 @@ X_train_kbest.todense().shape
 
 from sklearn.naive_bayes import GaussianNB
 clf = GaussianNB()
-
+def firstLabelFast(data):
+   
+    rows,cols = data.toarray().nonzero()
+    
+    results=[]
+    pointer =0 
+    for i,j in zip(rows,cols):
+        if pointer == i:
+            results.append(j)
+            pointer= pointer +1
+    return results
 #
 #def getFirstLabel( y_train):
 #    y_train_first_label= []
@@ -83,22 +93,12 @@ def batch_prediction(data,clf=clf,size=128):
 
 
 
-clf.fit(X_train_kbest.toarray(), getFirstLabel(y_train))
+clf.fit(X_train_kbest.toarray(), firstLabelFast(y_train))
 
 predictions = batch_prediction(X_test_kbest.toarray(),clf)
 #predictions = clf.predict(X_test_kbest.toarray())
 
-def firstLabelFast(data):
-   
-    rows,cols = data.toarray().nonzero()
-    
-    results=[]
-    pointer =0 
-    for i,j in zip(rows,cols):
-        if pointer == i:
-            results.append(j)
-            pointer= pointer +1
-    return results
+
 #
 #def getAccuracy(testSet, predictions):
 #	correct = 0
