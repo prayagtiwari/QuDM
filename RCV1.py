@@ -46,69 +46,64 @@ y_train = train.target
 y_test = test.target
 
 X_train.shape
-y_train_dense = y_train.todense()
-x_train_dense = X_train.todense()
+#y_train_dense = y_train.todense()
+#x_train_dense = X_train.todense()
 
-def filter(data,condition,size=128):
+
+
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+chi2_selector = SelectKBest(chi2, k=1000)
+X_train_kbest = chi2_selector.fit_transform(X_train, y_train)
+X_test_kbest = chi2_selector.transform(X_test)
+X_test_kbest.todense().shape
+X_train_kbest.todense().shape
+
+
+from sklearn.naive_bayes import GaussianNB
+clf = GaussianNB()
+
+
+def getFirstLabel( y_train):
+    y_train_first_label= []
+    for i in range(y_train.toarray().shape[0]):
+        y_train_first_label.append(    y_train.toarray()[i].nonzero()[0][0])
+    return y_train_first_label
+    
+def batch_prediction(data,clf=clf,size=128):
     # data,condition = x_train_dense,  y_train_dense[:,i]==1
     results= []
     for i in range(int(data.shape[0]/128)+1):
         start = i*   size
         end =  (i+1)*   size
-        subresult = data[start:end] [condition[start:end].getA().squeeze()]
-        results.append(subresult.getA())
+        sub_samples = data[start:end] 
+        results.append(clf.predict(sub_samples))
+        print(len(results))
     return np.concatenate(np.array(results))
 
-def chisqr_featselection(data,subdata_index,topk=100):
-    a = sum(subdata_index)[0,0]
-    b = data.shape[0] - a
-    subfeature = filter(data,subdata_index)
-    c = sum(np.sum(subfeature,1) < 1e-5)  # careful
-    otherfeature = filter(data,~subdata_index)
-    d = sum(np.sum(otherfeature,1) < 1e-5)
-    # ....   
-    
-    return
-    
+
+clf.fit(X_train_kbest.toarray(), getFirstLabel(y_train))
+
+predictions = batch_prediction(X_test_kbest.toarray(),clf)
+#predictions = clf.predict(X_test_kbest.toarray())
 
 
-#function fF = chisqr_featselection(F,L,m)
-#
-#    n = size(F,1);
-# 
-#    % number of examples with the feature and the category
-#    a = sum((F.*L)>0);
-#    % number of examples with the feature but not the category    
-#    b = sum((F.*(L==0))>0);
-#    % number of examples in the category but with no feature
-#    c = sum((F.*L)==0);
-#    % number of examples not in the category and with no feature
-#    d = sum((F.*(L==0))==0);
-#      
-#%     a(1,18931)
-#%     b(1,18931)
-#%     c(1,18931)
-#%     d(1,18931)
-#    
-#    w = n.*(a.*d - b.*c)./((a+b).*(a+c).*(b+d).*(c+d));
-#   
-#    w = fillmissing(w, 'constant',  -Inf);
-#   
-#    [sortvals, sortidx] = sort(w,2,'descend'); 
-#        
-#    B = zeros(size(w),class(w)); 
-#    for K = 1 : size(w,1) 
-#        B(K,sortidx(K,1:m)) = sortvals(K,1:m); 
-#    end
-#    
-#    fF = B;
-#            
-#end
+def getAccuracy(testSet, predictions):
+	correct = 0
+	for x in range(len(testSet)):
+		if testSet[x][-1] == predictions[x]:
+			correct += 1
+	return (correct/float(len(testSet))) * 100.0
 
-for i in range(rcv1.target.shape[-1]):
-    subfeaters = filter(x_train_dense,  y_train_dense[:,i]==1)
-    print(subfeaters.shape)
-    chi2(subfeaters)    
+acc=getAccuracy(getFirstLabel(y_test),predictions)
+print(acc)
+
+   
+
+
+
+
 #from keras.models import Sequential
 #from keras.layers import Dense, Activation, Embedding
 #from keras.layers import LSTM
@@ -136,10 +131,4 @@ for i in range(rcv1.target.shape[-1]):
 
 
 
-for i in range(103):
-    topic = i
-    
-    traintopic = y_train
-    testtopic = y_test
-    
     
