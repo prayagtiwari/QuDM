@@ -79,7 +79,6 @@ def batch_prediction(data,clf=clf,size=128):
         end =  (i+1)*   size
         sub_samples = data[start:end] 
         results.append(clf.predict(sub_samples))
-        print(len(results))
     return np.concatenate(np.array(results))
 
 
