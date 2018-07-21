@@ -32,6 +32,8 @@ rcv1.sample_id[:3]
 #              from 5 occurrences for ‘GMIL’, to 381327 for ‘CCAT’:
 rcv1.target_names[:10].tolist() 
 
+# hha
+
 
 train = fetch_rcv1(subset='train')
 test = fetch_rcv1(subset='test')
