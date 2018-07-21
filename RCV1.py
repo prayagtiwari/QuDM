@@ -66,7 +66,18 @@ def chisqr_featselection(data,subdata_index,topk=100):
     c = sum(np.sum(subfeature,1) < 1e-5)  # careful
     otherfeature = filter(data,~subdata_index)
     d = sum(np.sum(otherfeature,1) < 1e-5)
-    # ....   
+    # ....  
+    w = np.multiply(n, (np.multiply(a,d)-np.multiply(b,c)/ (np.multiply(a+b, a+c, b+d, c+d))
+    w =  np.nan_to_num(w, copy=True)
+    
+
+    [sortvals, sortidx] = list.sort(w, 'descend')
+    
+    B =np.zeros(w.shape, self.w)
+    for k in range (w.shape[0]):
+        B(K,sortidx(K,1:m)) = sortvals(K,1:m)
+    end 
+    fF = B
     
     return
     
@@ -134,12 +145,5 @@ for i in range(rcv1.target.shape[-1]):
 #print('Test accuracy:', acc)
 
 
-
-
-for i in range(103):
-    topic = i
-    
-    traintopic = y_train
-    testtopic = y_test
     
     
